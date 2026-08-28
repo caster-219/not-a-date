@@ -186,6 +186,82 @@ input[type="date"],input[type="time"]{
 }
 </style>
 
+
+<style id="restaurant-cafe-suboptions-style">
+.food-subpanel{
+  display:none;
+  margin:18px 0 4px;
+  padding-top:6px;
+}
+.food-subpanel.show{display:block}
+.food-subtitle{
+  margin:4px 0 12px;
+  font-size:14px;
+  font-weight:800;
+  color:#ed2f72;
+}
+.food-pair-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+.food-pair{
+  position:relative;
+  text-align:left;
+  background:#fff;
+  border:1.5px solid #f1d9e2;
+  border-radius:16px;
+  padding:14px 15px 13px 48px;
+  box-shadow:0 6px 14px rgba(125,77,95,.07);
+  cursor:pointer;
+  transition:.18s ease;
+}
+.food-pair:hover{
+  transform:translateY(-1px);
+  border-color:#f3a4bf;
+  box-shadow:0 9px 18px rgba(125,77,95,.11);
+}
+.food-pair.selected{
+  border:2px solid #ed2f72;
+  background:#fff5f8;
+  box-shadow:0 8px 20px rgba(237,47,114,.12);
+}
+.food-pair-num{
+  position:absolute;
+  left:13px;
+  top:14px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#ed2f72;
+  color:#fff;
+  font-size:12px;
+  font-weight:900;
+}
+.food-pair-name{
+  display:block;
+  color:#41383e;
+  font-size:15px;
+  font-weight:850;
+  line-height:1.4;
+}
+.food-pair-cafe{
+  display:block;
+  margin-top:5px;
+  color:#8b6675;
+  font-size:13px;
+  line-height:1.45;
+}
+.food-pair.selected .food-pair-name{color:#ed2f72}
+@media(max-width:560px){
+  .food-pair{padding:13px 12px 12px 44px}
+  .food-pair-name{font-size:14px}
+  .food-pair-cafe{font-size:12px}
+}
+</style>
+
 </head>
 <body>
 <div class="card">
@@ -207,35 +283,67 @@ input[type="date"],input[type="time"]{
 
 <section id="page2" class="page">
 <h2>那妳想幹嘛？</h2><p>選一個就好，其他看當天心情。</p>
-<div class="option-grid" data-type="activity">
-<div class="option" data-value="吃好吃的東東" onclick="selectOption('activity','吃好吃的東東',this)"><span class="icon">🍽️</span>吃好吃的東東</div>
-<div class="option" data-value="隨便逛逛" onclick="selectOption('activity','隨便逛逛',this)"><span class="icon">🛍️</span>隨便逛逛</div>
-<div class="option" data-value="喝好喝的東東" onclick="selectOption('activity','喝好喝的東東',this)"><span class="icon">🥤</span>喝好喝的東東</div>
-<div class="option" data-value="散步聊天" onclick="selectOption('activity','散步聊天',this)"><span class="icon">🌙</span>散步聊天</div>
+<div class="option-grid" data-type="activityType">
+<div class="option" data-value="吃好吃的東東" onclick="chooseActivity('吃好吃的東東',this)"><span class="icon">🍽️</span>吃好吃的東東</div>
+<div class="option" data-value="隨便逛逛" onclick="chooseActivity('隨便逛逛',this)"><span class="icon">🛍️</span>隨便逛逛</div>
+<div class="option" data-value="喝好喝的東東" onclick="chooseActivity('喝好喝的東東',this)"><span class="icon">🥤</span>喝好喝的東東</div>
+<div class="option" data-value="散步聊天" onclick="chooseActivity('散步聊天',this)"><span class="icon">🌙</span>散步聊天</div>
 </div>
-<div class="nav"><button class="back" onclick="showPage(1)">← 上一頁</button><button id="activityNext" class="next" onclick="showPage(3)" disabled>下一題 →</button></div>
+
+<div id="activitySubpanel" class="food-subpanel">
+  <div id="activitySubtitle" class="food-subtitle"></div>
+  <div id="activityPlaceGrid" class="food-pair-grid"></div>
+</div>
+
+<div id="activityCafeSubpanel" class="food-subpanel">
+  <div class="food-subtitle">那想去哪間喝好喝的？</div>
+  <div id="activityCafeGrid" class="food-pair-grid"></div>
+</div>
+
+<div class="nav"><button class="back" onclick="showPage(1)">← 上一頁</button><button id="activityNext" class="next" onclick="goFromActivity()" disabled>下一題 →</button></div>
 </section>
 
 <section id="page3" class="page">
-<h2>想吃什麼？</h2><p>先決定一個方向。</p>
-<div class="option-grid" data-type="food">
-<div class="option" data-value="義式料理" onclick="selectOption('food','義式料理',this)"><span class="icon">🍝</span>義式</div>
-<div class="option" data-value="日式料理" onclick="selectOption('food','日式料理',this)"><span class="icon">🍣</span>日式</div>
-<div class="option" data-value="火鍋" onclick="selectOption('food','火鍋',this)"><span class="icon">🍲</span>火鍋</div>
-<div class="option" data-value="妳決定" onclick="selectOption('food','妳決定',this)"><span class="icon">🎲</span>妳決定</div>
+<h2>想吃什麼？</h2><p>先選一個方向，再挑一間店。</p>
+
+<div class="option-grid" data-type="foodCategory">
+<div class="option" data-value="義式料理" onclick="chooseFoodCategory('義式料理',this)"><span class="icon">🍝</span>義式</div>
+<div class="option" data-value="港式茶點" onclick="chooseFoodCategory('港式茶點',this)"><span class="icon">🥟</span>港式茶點</div>
+<div class="option" data-value="火鍋" onclick="chooseFoodCategory('火鍋',this)"><span class="icon">🍲</span>火鍋</div>
+<div class="option" data-value="日式料理" onclick="chooseFoodCategory('日式料理',this)"><span class="icon">🍣</span>日式</div>
 </div>
-<div class="nav"><button class="back" onclick="showPage(2)">← 上一頁</button><button id="foodNext" class="next" onclick="showPage(4)" disabled>下一題 →</button></div>
+
+<div id="foodSubpanel" class="food-subpanel">
+  <div class="food-subtitle">再選一間餐廳：</div>
+  <div id="foodPairGrid" class="food-pair-grid"></div>
+</div>
+
+<div class="nav">
+<button class="back" onclick="showPage(2)">← 上一頁</button>
+<button id="foodNext" class="next" onclick="showPage(4)" disabled>下一題 →</button>
+</div>
 </section>
 
 <section id="page4" class="page">
-<h2>吃完要不要續攤？</h2><p>這題可以看當天心情。</p>
+<h2 id="afterTitle">吃完要不要續攤？</h2><p id="afterIntro">這題可以看當天心情。</p>
 <div class="option-grid" data-type="after">
-<div class="option" data-value="吃甜點" onclick="selectOption('after','吃甜點',this)"><span class="icon">🍰</span>吃甜點</div>
-<div class="option" data-value="喝咖啡" onclick="selectOption('after','喝咖啡',this)"><span class="icon">☕</span>喝咖啡</div>
+<div id="afterDessertOption" class="option" data-value="吃甜點" onclick="selectOption('after','吃甜點',this)"><span class="icon">🍰</span>吃甜點</div>
+<div id="afterCoffeeOption" class="option" data-value="喝咖啡" onclick="selectOption('after','喝咖啡',this)"><span class="icon">☕</span>喝咖啡</div>
 <div class="option" data-value="晃一下" onclick="selectOption('after','晃一下',this)"><span class="icon">🚶</span>晃一下</div>
 <div class="option" data-value="到時再說" onclick="selectOption('after','到時再說',this)"><span class="icon">🎲</span>到時再說</div>
 </div>
-<div class="nav"><button class="back" onclick="showPage(3)">← 上一頁</button><button id="afterNext" class="next" onclick="showPage(5)" disabled>下一題 →</button></div>
+
+<div id="cafeSubpanel" class="food-subpanel">
+  <div class="food-subtitle">那再選一間附近的咖啡店：</div>
+  <div id="cafePairGrid" class="food-pair-grid"></div>
+</div>
+
+<div id="afterPlaceSubpanel" class="food-subpanel">
+  <div class="food-subtitle">那想去哪裡晃一下？</div>
+  <div id="afterPlaceGrid" class="food-pair-grid"></div>
+</div>
+
+<div class="nav"><button class="back" onclick="goBackFromAfter()">← 上一頁</button><button id="afterNext" class="next" onclick="showPage(5)" disabled>下一題 →</button></div>
 </section>
 
 <section id="page5" class="page">
@@ -272,7 +380,552 @@ input[type="date"],input[type="time"]{
 // 範例：https://script.google.com/macros/s/XXXXXXXX/exec
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNuR_tnVOeMJGQlwKmzxAxfu27yXZqv1VZJu59KefugIzB0432fYI26Y34OVyAokG0bg/exec";
 
-const answers={activity:"",food:"",after:"",transport:"",date:"",time:""};
+const answers={activityType:"",activityPlace:"",activity:"",foodCategory:"",food:"",restaurant:"",cafe:"",after:"",afterPlace:"",transport:"",date:"",time:""};
+
+const activityChoices = {
+  "隨便逛逛": [
+    "駁二＋誠品",
+    "TSUTAYA 大立",
+    "義享天地",
+    "夢時代",
+    "內惟藝術中心",
+    "新堀江晃晃"
+  ],
+  "散步聊天": [
+    "駁二＋大港橋",
+    "愛河灣走走",
+    "美術館／內惟埤",
+    "中央公園",
+    "文化中心附近",
+    "到時再決定"
+  ]
+};
+
+function activityNeedsPlace(){
+  return answers.activityType === "隨便逛逛" ||
+         answers.activityType === "散步聊天";
+}
+
+function refreshActivityPayload(){
+  if(!answers.activityType){
+    answers.activity = "";
+    return;
+  }
+
+  answers.activity = answers.activityType;
+
+  if(answers.activityPlace){
+    answers.activity += `｜地點：${answers.activityPlace}`;
+  }
+}
+
+function chooseActivity(type, el){
+  const changed = answers.activityType !== type;
+  answers.activityType = type;
+
+  document.querySelectorAll('[data-type="activityType"] .option')
+    .forEach(o=>o.classList.remove("selected"));
+  el.classList.add("selected");
+
+  if(changed){
+    answers.activityPlace = "";
+    answers.cafe = "";
+
+    // 單純去喝東西時，不保留餐廳選擇。
+    if(type === "喝好喝的東東"){
+      answers.foodCategory = "";
+      answers.restaurant = "";
+      answers.food = "";
+
+      if(answers.after === "吃甜點" || answers.after === "喝咖啡"){
+        answers.after = "";
+        answers.afterPlace = "";
+      }
+    }
+  }
+
+  refreshActivityPayload();
+  refreshFoodPayload();
+  renderActivitySuboptions();
+  renderActivityCafeSuboptions();
+  renderCafeSuboptions();
+  updateAfterCopy();
+  updateButtons();
+}
+
+function chooseActivityCafe(cafe){
+  answers.cafe = cafe;
+  refreshFoodPayload();
+  renderActivityCafeSuboptions();
+  updateButtons();
+}
+
+function renderActivityCafeSuboptions(){
+  const panel = document.getElementById("activityCafeSubpanel");
+  const grid = document.getElementById("activityCafeGrid");
+  if(!panel || !grid) return;
+
+  if(!isDrinkOnlyRoute()){
+    panel.classList.remove("show");
+    grid.innerHTML = "";
+    return;
+  }
+
+  panel.classList.add("show");
+  grid.innerHTML = generalCafeChoices.map((cafe,i)=>{
+    const selected = cafe === answers.cafe ? " selected" : "";
+    return `
+      <div class="food-pair${selected}" onclick='chooseActivityCafe(${JSON.stringify(cafe)})'>
+        <span class="food-pair-num">${i+1}</span>
+        <span class="food-pair-name">☕ ${cafe}</span>
+      </div>`;
+  }).join("");
+}
+
+function goFromActivity(){
+  if(isDrinkOnlyRoute()){
+    showPage(4);
+  }else{
+    showPage(3);
+  }
+}
+
+function goBackFromAfter(){
+  if(isDrinkOnlyRoute()){
+    showPage(2);
+  }else{
+    showPage(3);
+  }
+}
+
+function updateAfterCopy(){
+  const title = document.getElementById("afterTitle");
+  const intro = document.getElementById("afterIntro");
+  const dessert = document.getElementById("afterDessertOption");
+  const coffee = document.getElementById("afterCoffeeOption");
+  if(!title || !intro) return;
+
+  if(isDrinkOnlyRoute()){
+    title.textContent = "喝完之後呢？";
+    intro.textContent = "想再晃一下，還是到時再說？";
+
+    if(dessert) dessert.style.display = "none";
+    if(coffee) coffee.style.display = "none";
+
+    if(answers.after === "吃甜點" || answers.after === "喝咖啡"){
+      answers.after = "";
+      answers.afterPlace = "";
+    }
+  }else{
+    title.textContent = "吃完要不要續攤？";
+    intro.textContent = "這題可以看當天心情。";
+
+    if(dessert) dessert.style.display = "";
+    if(coffee) coffee.style.display = "";
+  }
+}
+
+function chooseActivityPlace(place){
+  answers.activityPlace = place;
+  refreshActivityPayload();
+  renderActivitySuboptions();
+  updateButtons();
+}
+
+function renderActivitySuboptions(){
+  const panel = document.getElementById("activitySubpanel");
+  const title = document.getElementById("activitySubtitle");
+  const grid = document.getElementById("activityPlaceGrid");
+  if(!panel || !title || !grid) return;
+
+  const list = activityChoices[answers.activityType];
+
+  if(!list){
+    panel.classList.remove("show");
+    grid.innerHTML = "";
+    answers.activityPlace = "";
+    refreshActivityPayload();
+    return;
+  }
+
+  panel.classList.add("show");
+  title.textContent = answers.activityType === "隨便逛逛"
+    ? "那想去哪裡隨便晃晃？"
+    : "那想去哪裡走走聊天？";
+
+  grid.innerHTML = list.map((place,i)=>{
+    const selected = place === answers.activityPlace ? " selected" : "";
+    const icon = answers.activityType === "隨便逛逛" ? "📍" : "🌿";
+    return `
+      <div class="food-pair${selected}" onclick='chooseActivityPlace(${JSON.stringify(place)})'>
+        <span class="food-pair-num">${i+1}</span>
+        <span class="food-pair-name">${icon} ${place}</span>
+      </div>`;
+  }).join("");
+}
+
+const generalCafeChoices = [
+  "卡啡那 美術館",
+  "成真咖啡 高雄義享店",
+  "阡陌一舍 UNS",
+  "Coffee Ring",
+  "成真咖啡 高雄夢時代店"
+];
+
+const foodChoices = {
+  "義式料理": [
+    {restaurant:"雛菊 DAISY VILLA 高雄青海店"},
+    {restaurant:"all'Onda 浪。義大利慢食廚房"},
+    {restaurant:"BELLINI Pasta Pasta 高雄夢時代店"},
+    {restaurant:"帕狄尼諾 Padrino 義大利廚房"},
+    {restaurant:"Tino's Pizza"}
+  ],
+  "港式茶點": [
+    {restaurant:"蒸鮮腸粉港式飲茶 義享店"},
+    {restaurant:"翰品酒店高雄－港都茶樓"},
+    {restaurant:"好正點港式飲茶 三多店"},
+    {restaurant:"東悅坊港式飲茶 高雄店"},
+    {restaurant:"點點心 高雄夢時代店"}
+  ],
+  "火鍋": [
+    {restaurant:"問鼎 高雄義享店"},
+    {restaurant:"舞古賀 鍋物專門店"},
+    {restaurant:"天鍋麻辣 鴛鴦鍋 高雄時代店"},
+    {restaurant:"汕頭泉成沙茶火鍋 高雄美麗島中山總店"},
+    {restaurant:"湯棧 中山店"}
+  ],
+  "日式料理": [
+    {restaurant:"墨吉日本料理"},
+    {restaurant:"藝奇 高雄夢時代店"},
+    {restaurant:"宫圓日本料理"},
+    {restaurant:"和田古早味日式料理"},
+    {restaurant:"翰品酒店高雄－品日料"}
+  ]
+};
+
+const cafeChoices = {
+  "雛菊 DAISY VILLA 高雄青海店": [
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店",
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店"
+  ],
+  "all'Onda 浪。義大利慢食廚房": [
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店",
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店"
+  ],
+  "BELLINI Pasta Pasta 高雄夢時代店": [
+    "成真咖啡 高雄夢時代店",
+    "CACO cafe 高雄夢時代店",
+    "星巴克 高雄時代門市",
+    "Starbucks 高雄夢時代門市",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－夢時代店"
+  ],
+  "帕狄尼諾 Padrino 義大利廚房": [
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店",
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店"
+  ],
+  "Tino's Pizza": [
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店",
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店"
+  ],
+
+  "蒸鮮腸粉港式飲茶 義享店": [
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店",
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店"
+  ],
+  "翰品酒店高雄－港都茶樓": [
+    "阡陌一舍 UNS",
+    "koou coffee",
+    "Do good coffee & dessert",
+    "神諭咖啡 駁二店",
+    "書店喫茶 一二三亭"
+  ],
+  "好正點港式飲茶 三多店": [
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－大遠百店",
+    "woosa 屋莎洋食鬆餅屋 高雄大遠百店",
+    "Coffee Ring",
+    "有。咖啡",
+    "MINI.D COFFEE 復興館"
+  ],
+  "東悅坊港式飲茶 高雄店": [
+    "成真咖啡 高雄夢時代店",
+    "CACO cafe 高雄夢時代店",
+    "星巴克 高雄時代門市",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－大遠百店",
+    "Coffee Ring"
+  ],
+  "點點心 高雄夢時代店": [
+    "成真咖啡 高雄夢時代店",
+    "CACO cafe 高雄夢時代店",
+    "星巴克 高雄時代門市",
+    "Starbucks 高雄夢時代門市",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－夢時代店"
+  ],
+
+  "問鼎 高雄義享店": [
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店",
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店"
+  ],
+  "舞古賀 鍋物專門店": [
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店",
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店"
+  ],
+  "天鍋麻辣 鴛鴦鍋 高雄時代店": [
+    "成真咖啡 高雄夢時代店",
+    "CACO cafe 高雄夢時代店",
+    "星巴克 高雄時代門市",
+    "Starbucks 高雄夢時代門市",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－夢時代店"
+  ],
+  "汕頭泉成沙茶火鍋 高雄美麗島中山總店": [
+    "美森咖啡",
+    "Coffee Ring",
+    "有。咖啡",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－大遠百店",
+    "MINI.D COFFEE 復興館"
+  ],
+  "湯棧 中山店": [
+    "Coffee Ring",
+    "有。咖啡",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－大遠百店",
+    "MINI.D COFFEE 復興館",
+    "美森咖啡"
+  ],
+
+  "墨吉日本料理": [
+    "成真咖啡 高雄義享店",
+    "Kingmauii 金茂宜咖啡 義享店",
+    "卡啡那 美術館",
+    "MINI.D COFFEE 美術館",
+    "客美多咖啡 高雄美術館店"
+  ],
+  "藝奇 高雄夢時代店": [
+    "成真咖啡 高雄夢時代店",
+    "CACO cafe 高雄夢時代店",
+    "星巴克 高雄時代門市",
+    "Starbucks 高雄夢時代門市",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－夢時代店"
+  ],
+  "宫圓日本料理": [
+    "Coffee Ring",
+    "有。咖啡",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－大遠百店",
+    "MINI.D COFFEE 復興館",
+    "美森咖啡"
+  ],
+  "和田古早味日式料理": [
+    "美森咖啡",
+    "Coffee Ring",
+    "有。咖啡",
+    "AROSA COFFEE 阿洛薩手工烘焙咖啡－大遠百店",
+    "MINI.D COFFEE 復興館"
+  ],
+  "翰品酒店高雄－品日料": [
+    "阡陌一舍 UNS",
+    "koou coffee",
+    "Do good coffee & dessert",
+    "神諭咖啡 駁二店",
+    "書店喫茶 一二三亭"
+  ]
+};
+
+const afterPlaceChoices = [
+  "駁二＋大港橋",
+  "愛河灣",
+  "美術館／內惟埤",
+  "中央公園",
+  "文化中心附近",
+  "高雄市立圖書館總館",
+  "義享天地",
+  "夢時代",
+  "漢神巨蛋",
+  "SKM Park Outlets 高雄草衙",
+  "大立＋TSUTAYA",
+  "高雄大遠百＋誠品",
+  "新堀江商圈",
+  "到時再決定"
+];
+
+function afterNeedsPlace(){
+  return answers.after === "晃一下";
+}
+
+function chooseAfterPlace(place){
+  answers.afterPlace = place;
+  renderAfterPlaceSuboptions();
+  updateButtons();
+}
+
+function renderAfterPlaceSuboptions(){
+  const panel = document.getElementById("afterPlaceSubpanel");
+  const grid = document.getElementById("afterPlaceGrid");
+  if(!panel || !grid) return;
+
+  if(!afterNeedsPlace()){
+    panel.classList.remove("show");
+    grid.innerHTML = "";
+    answers.afterPlace = "";
+    return;
+  }
+
+  panel.classList.add("show");
+  grid.innerHTML = afterPlaceChoices.map((place,i)=>{
+    const selected = place === answers.afterPlace ? " selected" : "";
+    return `
+      <div class="food-pair${selected}" onclick='chooseAfterPlace(${JSON.stringify(place)})'>
+        <span class="food-pair-num">${i+1}</span>
+        <span class="food-pair-name">📍 ${place}</span>
+      </div>`;
+  }).join("");
+}
+
+function isDrinkOnlyRoute(){
+  return answers.activityType === "喝好喝的東東";
+}
+
+function needsCafeSelection(){
+  return answers.after === "吃甜點" ||
+         answers.after === "喝咖啡";
+}
+
+function refreshFoodPayload(){
+  if(isDrinkOnlyRoute()){
+    answers.food = answers.cafe ? `喝好喝的東東｜咖啡：${answers.cafe}` : "";
+    return;
+  }
+
+  if(!answers.foodCategory || !answers.restaurant){
+    answers.food = "";
+    return;
+  }
+
+  answers.food = `${answers.foodCategory}｜${answers.restaurant}`;
+  if(answers.cafe){
+    answers.food += `｜咖啡：${answers.cafe}`;
+  }
+}
+
+function chooseFoodCategory(category, el){
+  const changed = answers.foodCategory !== category;
+  answers.foodCategory = category;
+
+  document.querySelectorAll('[data-type="foodCategory"] .option')
+    .forEach(o=>o.classList.remove("selected"));
+  el.classList.add("selected");
+
+  if(changed){
+    answers.food = "";
+    answers.restaurant = "";
+    answers.cafe = "";
+  }
+
+  renderFoodSuboptions();
+  renderCafeSuboptions();
+  refreshFoodPayload();
+  updateButtons();
+}
+
+function chooseFoodPair(index){
+  const item = foodChoices[answers.foodCategory][index];
+
+  if(answers.restaurant !== item.restaurant){
+    answers.cafe = "";
+  }
+
+  answers.restaurant = item.restaurant;
+  refreshFoodPayload();
+
+  document.querySelectorAll("#foodPairGrid .food-pair")
+    .forEach((o,i)=>o.classList.toggle("selected", i===index));
+
+  renderCafeSuboptions();
+  updateButtons();
+}
+
+function renderFoodSuboptions(){
+  const panel = document.getElementById("foodSubpanel");
+  const grid = document.getElementById("foodPairGrid");
+  if(!panel || !grid) return;
+
+  const list = foodChoices[answers.foodCategory];
+  if(!list){
+    panel.classList.remove("show");
+    grid.innerHTML = "";
+    return;
+  }
+
+  panel.classList.add("show");
+  grid.innerHTML = list.map((item,i)=>{
+    const selected = item.restaurant===answers.restaurant ? " selected" : "";
+    return `
+      <div class="food-pair${selected}" onclick="chooseFoodPair(${i})">
+        <span class="food-pair-num">${i+1}</span>
+        <span class="food-pair-name">🍽️ ${item.restaurant}</span>
+      </div>`;
+  }).join("");
+}
+
+function chooseCafe(cafe){
+  answers.cafe = cafe;
+  refreshFoodPayload();
+  renderCafeSuboptions();
+  updateButtons();
+}
+
+function renderCafeSuboptions(){
+  const panel = document.getElementById("cafeSubpanel");
+  const grid = document.getElementById("cafePairGrid");
+  if(!panel || !grid) return;
+
+  if(!needsCafeSelection()){
+    panel.classList.remove("show");
+    grid.innerHTML = "";
+
+    // 餐廳路線如果取消咖啡/甜點續攤，就清掉咖啡。
+    // 喝好喝的東東路線則保留第一頁已選的咖啡店。
+    if(!isDrinkOnlyRoute()){
+      answers.cafe = "";
+      refreshFoodPayload();
+    }
+    return;
+  }
+
+  const list = answers.restaurant
+    ? (cafeChoices[answers.restaurant] || generalCafeChoices)
+    : generalCafeChoices;
+
+  panel.classList.add("show");
+
+  grid.innerHTML = list.map((cafe,i)=>{
+    const selected = cafe===answers.cafe ? " selected" : "";
+    return `
+      <div class="food-pair${selected}" onclick='chooseCafe(${JSON.stringify(cafe)})'>
+        <span class="food-pair-num">${i+1}</span>
+        <span class="food-pair-name">☕ ${cafe}</span>
+      </div>`;
+  }).join("");
+}
+
 let noCount=0;
 function random(min,max){return Math.floor(Math.random()*(max-min+1))+min}
 function rejectDate(){
@@ -287,7 +940,10 @@ function acceptDate(){document.getElementById("yesBtn").style.transform="scale(1
 function showPage(n){
  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
  document.getElementById("page"+n).classList.add("active");
- restoreSelections();restoreDateTime();updateProgress(n);
+ restoreSelections();
+ restoreDateTime();
+ updateAfterCopy();
+ updateProgress(n);
 }
 function updateProgress(n){
  const w=document.getElementById("progressWrap");
@@ -297,16 +953,49 @@ function updateProgress(n){
  document.getElementById("progressFill").style.width=`${s*20}%`;
 }
 function selectOption(t,v,e){
- answers[t]=v;e.parentElement.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));e.classList.add("selected");updateButtons();
+ answers[t]=v;
+ e.parentElement.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));
+ e.classList.add("selected");
+
+ if(t==="activity" || t==="after"){
+   renderCafeSuboptions();
+ }
+ if(t==="after"){
+   renderAfterPlaceSuboptions();
+ }
+ updateButtons();
 }
 function updateButtons(){
- document.getElementById("activityNext").disabled=!answers.activity;
- document.getElementById("foodNext").disabled=!answers.food;
- document.getElementById("afterNext").disabled=!answers.after;
+ document.getElementById("activityNext").disabled=
+   !answers.activityType ||
+   (activityNeedsPlace() && !answers.activityPlace) ||
+   (isDrinkOnlyRoute() && !answers.cafe);
+
+ document.getElementById("foodNext").disabled=
+   !answers.foodCategory || !answers.restaurant;
+
+ document.getElementById("afterNext").disabled=
+   !answers.after ||
+   (needsCafeSelection() && !answers.cafe) ||
+   (afterNeedsPlace() && !answers.afterPlace);
+
  document.getElementById("transportNext").disabled=!answers.transport;
 }
 function restoreSelections(){
- document.querySelectorAll(".option-grid").forEach(g=>{const t=g.dataset.type;if(!t)return;g.querySelectorAll(".option").forEach(o=>{o.classList.toggle("selected",o.dataset.value===answers[t])})});updateButtons();
+ document.querySelectorAll(".option-grid").forEach(g=>{
+   const t=g.dataset.type;
+   if(!t)return;
+   g.querySelectorAll(".option").forEach(o=>{
+     o.classList.toggle("selected",o.dataset.value===answers[t]);
+   });
+ });
+ renderActivitySuboptions();
+ renderActivityCafeSuboptions();
+ renderFoodSuboptions();
+ renderCafeSuboptions();
+ renderAfterPlaceSuboptions();
+ updateAfterCopy();
+ updateButtons();
 }
 function saveDateTime(){answers.date=document.getElementById("dateInput").value;answers.time=document.getElementById("timeInput").value}
 function restoreDateTime(){document.getElementById("dateInput").value=answers.date;document.getElementById("timeInput").value=answers.time}
@@ -316,7 +1005,7 @@ async function finishForm(){
   const status = document.getElementById("submitStatus");
   const btn = document.getElementById("submitBtn");
 
-  if(!answers.activity || !answers.food || !answers.after || !answers.transport){
+  if(!answers.activityType || (activityNeedsPlace() && !answers.activityPlace) || (isDrinkOnlyRoute() && !answers.cafe) || (!isDrinkOnlyRoute() && (!answers.foodCategory || !answers.restaurant)) || !answers.after || (afterNeedsPlace() && !answers.afterPlace) || !answers.transport || (needsCafeSelection() && !answers.cafe)){
     status.className = "submit-status error";
     status.textContent = "前面的選項還沒選完喔。";
     return;
@@ -334,14 +1023,22 @@ async function finishForm(){
 
   // 先準備成交頁內容
   document.getElementById("summary").innerHTML =
-    `🎯 <strong>想做：</strong>${answers.activity}<br>` +
-    `🍽️ <strong>想吃：</strong>${answers.food}<br>` +
+    `🎯 <strong>想做：</strong>${answers.activityType}<br>` +
+    (answers.activityPlace ? `📍 <strong>地點：</strong>${answers.activityPlace}<br>` : "") +
+    (!isDrinkOnlyRoute() ? `🍽️ <strong>類型：</strong>${answers.foodCategory}<br>` : "") +
+    (!isDrinkOnlyRoute() ? `🍴 <strong>餐廳：</strong>${answers.restaurant}<br>` : "") +
+    (answers.cafe ? `☕ <strong>咖啡：</strong>${answers.cafe}<br>` : "") +
     `🌙 <strong>續攤：</strong>${answers.after}<br>` +
+    (answers.afterPlace ? `📍 <strong>晃晃地點：</strong>${answers.afterPlace}<br>` : "") +
     `🚙 <strong>交通：</strong>${answers.transport}<br>` +
     `📅 <strong>日期：</strong>${answers.date || "當天再決定"}<br>` +
     `🕐 <strong>時間：</strong>${answers.time || "再說"}`;
 
-  const payload = JSON.stringify(answers);
+  const payloadData = {...answers};
+  if(payloadData.afterPlace){
+    payloadData.after = `${payloadData.after}｜地點：${payloadData.afterPlace}`;
+  }
+  const payload = JSON.stringify(payloadData);
 
   try {
     // GitHub Pages / 一般瀏覽器：用 no-cors POST 傳到 Apps Script
